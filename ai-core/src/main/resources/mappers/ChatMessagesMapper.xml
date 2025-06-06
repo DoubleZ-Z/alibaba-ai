@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ai.mapper.ChatMessagesMapper">
+    <sql id="tableName">
+        chat_messages
+    </sql>
+
+    <sql id="baseColumn">
+        id
+        ,session_id,message_type,content,created_at,deleted
+    </sql>
+
+    <insert id="insertBatch">
+        insert into chat_messages (
+        session_id,message_type,content,created_at,deleted
+        ) values
+        <foreach collection="list" item="message" separator=",">
+            (#{message.sessionId},#{message.messageType},#{message.content},#{message.createdAt}),#{message.deleted}
+        </foreach>
+    </insert>
+    <select id="selectBySessionId" resultType="com.ai.dto.MessageDTO">
+        SELECT id           messageId,
+               content,
+               message_type role,
+               created_at    createAt
+        FROM `chat_messages`
+        WHERE deleted = false and session_id = #{sessionId}
+        ORDER BY created_at
+    </select>
+</mapper>

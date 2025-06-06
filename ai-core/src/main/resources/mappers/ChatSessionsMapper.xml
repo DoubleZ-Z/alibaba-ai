@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ai.mapper.ChatSessionsMapper">
+    <sql id="tableName">
+        chat_sessions
+    </sql>
+
+    <sql id="baseColumn">
+        session_id,created_at,last_accessed_at,metadata,deleted
+    </sql>
+    <select id="selectMenuAll" resultType="com.ai.dto.MenuDTO">
+        select session_id                 sessionId,
+               SUBSTRING(metadata, 1, 15) title
+        from chat_sessions
+        where deleted = false
+    </select>
+</mapper>
