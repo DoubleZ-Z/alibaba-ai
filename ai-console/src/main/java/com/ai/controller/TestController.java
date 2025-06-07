@@ -1,21 +1,20 @@
 package com.ai.controller;
 
 import com.ai.controller.base.CommonController;
-import com.ai.dto.MessageDTO;
+import com.ai.exception.CommonsException;
 import com.ai.message.MySQLChatMemory;
 import com.ai.service.ChatService;
 import com.ai.uitl.ViewResult;
+import com.ai.vo.ChatCreateVO;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
 
 import java.util.List;
-
-import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
-
 /**
  * Create By YANYiZHI
  * Create Time: 2025/05/16 13:35
@@ -39,18 +38,20 @@ public class TestController extends CommonController {
     }
 
     @GetMapping("/new-chat/")
-    public ViewResult newChat(@RequestParam String input) {
+    public ViewResult newChat(@RequestParam String input) throws CommonsException {
         final String conversationId = chatService.createChat(input);
-        return ViewResult.ok(conversationId);
+        final ChatCreateVO chatCreateVO = new ChatCreateVO();
+        chatCreateVO.setSessionId(conversationId);
+        return ViewResult.ok(chatCreateVO);
     }
 
     @GetMapping(value = "/flux", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<String>> chat(@RequestParam String input, @RequestParam String sessionId) {
         //final String conversationId = chatMemory.addSession(sessionId, input);
-        final List<Message> messages = chatMemory.get(sessionId, 10);
+        final List<Message> messages = chatMemory.get(sessionId);
 
         return chatClient.prompt()
-                .advisors(a -> a.param(CHAT_MEMORY_CONVERSATION_ID_KEY, sessionId))
+                .advisors(a -> a.param(CONVERSATION_ID, sessionId))
                 .messages(messages)
                 .user(input)
                 .stream()

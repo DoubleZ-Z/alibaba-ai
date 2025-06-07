@@ -6,15 +6,13 @@ import com.ai.mapper.ChatMessagesMapper;
 import com.ai.mapper.ChatSessionsMapper;
 import com.ai.util.QuarkSnowflake;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.*;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.ObjectUtils;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -38,7 +36,7 @@ public class MySQLChatMemory implements ChatMemory {
     }
 
     @Override
-    public void add(String conversationId, List<Message> messages) {
+    public void add(@NotNull String conversationId, List<Message> messages) {
         final List<ChatMessages> collect = messages.stream().map(message -> {
             final ChatMessages chatMessages = new ChatMessages();
             chatMessages.setMessageType(message.getMessageType().getValue());
@@ -50,6 +48,20 @@ public class MySQLChatMemory implements ChatMemory {
         chatMessagesMapper.insertBatch(collect);
     }
 
+    @Override
+    public List<Message> get(@NotNull String conversationId) {
+        List<ChatMessages> dbMessages = chatMessagesMapper.selectList(
+                new LambdaQueryWrapper<ChatMessages>()
+                        .eq(ChatMessages::getSessionId, conversationId)
+                        .orderByDesc(ChatMessages::getCreatedAt)
+                        .last("LIMIT " + 10)
+        );
+
+        return dbMessages.stream()
+                .map(this::convertToMessage)
+                .collect(Collectors.toList());
+    }
+
     public String addSession(String conversationId, String input) {
         final boolean exists = chatSessionsMapper.exists(new LambdaQueryWrapper<ChatSessions>().eq(ChatSessions::getSessionId, conversationId));
         if (!exists) {
@@ -59,19 +71,6 @@ public class MySQLChatMemory implements ChatMemory {
         return conversationId;
     }
 
-    @Override
-    public List<Message> get(String conversationId, int lastN) {
-        List<ChatMessages> dbMessages = chatMessagesMapper.selectList(
-                new LambdaQueryWrapper<ChatMessages>()
-                        .eq(ChatMessages::getSessionId, conversationId)
-                        .orderByDesc(ChatMessages::getCreatedAt)
-                        .last("LIMIT " + lastN)
-        );
-
-        return dbMessages.stream()
-                .map(this::convertToMessage)
-                .collect(Collectors.toList());
-    }
 
     @Override
     public void clear(String conversationId) {

@@ -2,6 +2,7 @@ package com.ai.service.serviceImpl;
 
 import com.ai.dto.MessageDTO;
 import com.ai.entity.ChatSessions;
+import com.ai.exception.CommonsException;
 import com.ai.mapper.ChatMessagesMapper;
 import com.ai.mapper.ChatSessionsMapper;
 import com.ai.service.ChatService;
@@ -35,7 +36,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public String createChat(String input) {
+    public String createChat(String input) throws CommonsException {
         String conversationId = quarkSnowflake.nextStr();
         chatSessionsMapper.insert(new ChatSessions(conversationId, input));
         return conversationId;

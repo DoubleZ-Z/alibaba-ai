@@ -1,6 +1,7 @@
 package com.ai.service;
 
 import com.ai.dto.MessageDTO;
+import com.ai.exception.CommonsException;
 
 import java.util.List;
 
@@ -17,5 +18,5 @@ public interface ChatService {
 
     List<MessageDTO> queryMessage(String sessionId);
 
-    String createChat(String input);
+    String createChat(String input) throws CommonsException;
 }

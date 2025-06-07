@@ -15,7 +15,7 @@
         session_id,message_type,content,created_at,deleted
         ) values
         <foreach collection="list" item="message" separator=",">
-            (#{message.sessionId},#{message.messageType},#{message.content},#{message.createdAt}),#{message.deleted}
+            (#{message.sessionId},#{message.messageType},#{message.content},#{message.createdAt},#{message.deleted})
         </foreach>
     </insert>
     <select id="selectBySessionId" resultType="com.ai.dto.MessageDTO">

@@ -10,7 +10,7 @@
     </sql>
     <select id="selectMenuAll" resultType="com.ai.dto.MenuDTO">
         select session_id                 sessionId,
-               SUBSTRING(metadata, 1, 15) title
+               SUBSTRING(metadata, 1, 8) title
         from chat_sessions
         where deleted = false
     </select>
