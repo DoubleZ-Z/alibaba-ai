@@ -21,6 +21,11 @@ spring:
       chat:
         options:
           model: deepseek-v3
+    ai:
+      ollama:
+        base-url: http://localhost:11434
+        chat:
+          model: qwen2.5vl:7b
 mybatis-plus:
   mapper-locations: classpath:/mappers/*.xml
   global-config:

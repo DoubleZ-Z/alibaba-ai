@@ -3,6 +3,7 @@ package com.ai.controller;
 import com.ai.controller.base.CommonController;
 import com.ai.exception.CommonsException;
 import com.ai.message.MySQLChatMemory;
+import com.ai.router.ModelRouter;
 import com.ai.service.ChatService;
 import com.ai.uitl.ViewResult;
 import com.ai.vo.ChatCreateVO;
@@ -27,14 +28,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/chat")
 public class TestController extends CommonController {
-    private final ChatClient chatClient;
     private final MySQLChatMemory chatMemory;
     private final ChatService chatService;
+    private final ModelRouter modelRouter;
 
-    public TestController(ChatClient chatClient, MySQLChatMemory chatMemory, ChatService chatService) {
-        this.chatClient = chatClient;
+    public TestController(MySQLChatMemory chatMemory, ChatService chatService, ModelRouter modelRouter) {
         this.chatMemory = chatMemory;
         this.chatService = chatService;
+        this.modelRouter = modelRouter;
     }
 
     @GetMapping("/new-chat/")
@@ -49,7 +50,7 @@ public class TestController extends CommonController {
     public Flux<ServerSentEvent<String>> chat(@RequestParam String input, @RequestParam String sessionId) {
         //final String conversationId = chatMemory.addSession(sessionId, input);
         final List<Message> messages = chatMemory.get(sessionId);
-
+        ChatClient chatClient = modelRouter.route(input);
         return chatClient.prompt()
                 .advisors(a -> a.param(CONVERSATION_ID, sessionId))
                 .messages(messages)
