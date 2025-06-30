@@ -4,6 +4,8 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.Arrays;
+
 @SpringBootApplication(scanBasePackages = "com.ai")
 @MapperScan(basePackages = {"com.ai.mapper"})
 public class AliYunDeepSeekApplication {

@@ -13,9 +13,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
-import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
 
 import java.util.List;
+
+import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
+
 /**
  * Create By YANYiZHI
  * Create Time: 2025/05/16 13:35
@@ -63,5 +65,54 @@ public class TestController extends CommonController {
     @GetMapping("/history-message/{sessionId}")
     public ViewResult historyList(@PathVariable String sessionId) {
         return ViewResult.ok(chatService.queryMessage(sessionId));
+    }
+
+    public static void main(String[] args) {
+        int[] height = new int[]{0,1,0,2,1,0,1,3,2,1,2,1};
+        int totalSum = 0;
+        int first = 0;
+        int last = 0;
+        while (first + 2 <= height.length - 1) {
+            int sum = 0;
+            int temSecond = first + 1;
+            int temThird = first + 2;
+            if (last >= height.length - 1) {
+                break;
+            }
+            if (height[first] <= height[first + 1]) {
+                first++;
+            } else {
+                int temSum = 0;
+                while (temThird <= height.length - 1) {
+                    if (height[temSecond] >= height[temThird]) {
+                        //虚水
+                        /*if (height[temSecond] > height[temThird + 1]){
+                            sum += (height[temThird + 1] - height[temThird]) * (temThird - temSecond);
+                        }
+                        if (height[temSecond] == height[temThird]){
+                            temSecond = temThird;
+                        }
+                        if (height[temSecond] < height[temThird + 1]){
+                            sum += (height[temSecond] - height[temThird]) * (temThird - temSecond);
+                        }*/
+                        temSum += (height[temSecond] - height[temThird]);
+                        temThird++;
+                    } else {
+                        if (height[first] > height[temThird]) {
+                            sum += (height[temThird] - height[first + 1]) * (temThird - first - 1);
+                            temSecond = temThird;
+                            temThird++;
+                        } else {
+                            sum += (height[first] - height[temSecond]) * (temThird - first - 1);
+                            first = temThird;
+                            break;
+                        }
+                    }
+                }
+            }
+            last = temThird;
+            totalSum += sum;
+        }
+        System.out.println(totalSum);
     }
 }

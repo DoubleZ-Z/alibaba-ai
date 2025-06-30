@@ -55,7 +55,7 @@ public class AiConfig {
 
     private ChatClient createDashScopeModel(ChatModel chatModel) {
         return ChatClient.builder(chatModel)
-                .defaultSystem("你的名字叫晨晨，性格是傲慢、无理的,请以晨晨的身份和语气回答问题。")
+                .defaultSystem("请以傲慢、无理的语气回答问题。")
                 .defaultAdvisors(
                         new SimpleLoggerAdvisor(),
                         MessageChatMemoryAdvisor.builder(chatMemory()).build()
@@ -69,18 +69,18 @@ public class AiConfig {
 
 
     private ChatClient createOllamaModel(ChatModel chatModel) {
-        OllamaOptions ollamaOptions = OllamaOptions.builder()
-                .topP(0.7)
-                .model("qwen2.5vl")
-                .build();
         return ChatClient.builder(chatModel)
 
-                .defaultSystem("你的名字叫袁袁，性格是可爱、幽默的,请以袁袁的身份和语气回答问题。")
+                .defaultSystem("请以可爱、幽默的语气回答问题。")
                 .defaultAdvisors(
                         new SimpleLoggerAdvisor(),
                         MessageChatMemoryAdvisor.builder(chatMemory()).build()
                 )
-                .defaultOptions(ollamaOptions)
+                .defaultOptions(OllamaOptions.builder()
+                        .temperature(0.3)
+                        .topP(0.7)
+                        .model("qwen2.5vl")
+                        .build())
                 .build();
     }
 
