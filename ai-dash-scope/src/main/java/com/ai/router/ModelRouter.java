@@ -11,28 +11,25 @@ import java.util.Set;
 public class ModelRouter {
     private final ChatClient decisionClient;
     private final Map<String, ChatClient> modelMap;
+    private final Map<String, String> routerMap;
+    private final ClientRouter clientRouter = new ClientRouter();
 
-    public ModelRouter(@Qualifier("modelMap") Map<String, ChatClient> modelMap) {
+    public ModelRouter(@Qualifier("modelMap") Map<String, ChatClient> modelMap, @Qualifier("routerMap") Map<String, String> routerMap) {
         this.modelMap = modelMap;
+        this.routerMap = routerMap;
         this.decisionClient = modelMap.get("chat");
     }
 
-    public ChatClient route(String input) {
-        Map<String, String> routes = Map.of(
-                "technology", "你是一名资深技术专家",
-                "chat", "你是聊天助手"
-        );
+    public ClientRouter route(String input) {
 
-        String routeKey = determineRouteKey(input, routes.keySet());
+        String routeKey = determineRouteKey(input, routerMap.keySet());
 
-        // 步骤2: 获取对应的系统提示词
-        String systemPrompt = routes.get(routeKey);
+        String systemPrompt = routerMap.get(routeKey);
 
-        // 步骤3: 组合完整提示词
-        String fullPrompt = systemPrompt + "\n\n用户问题：" + input;
-
-        // 步骤4: 调用目标模型
-        return modelMap.get(routeKey);
+        String fullPrompt = systemPrompt + "\n\n用户输入：" + input;
+        clientRouter.setChatClient(modelMap.get(routeKey));
+        clientRouter.setFullPrompt(fullPrompt);
+        return clientRouter;
     }
 
     private String determineRouteKey(String input, Set<String> routeKeys) {
